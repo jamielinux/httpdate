@@ -15,9 +15,9 @@ __all__ = (
 )
 
 import calendar
-import datetime
 import re
 import time
+from datetime import datetime, timezone
 from typing import Dict, Optional, Tuple
 
 from leapseconds import LEAP_SECONDS
@@ -100,7 +100,7 @@ def _normalize_for_strptime(fmt: str, matches: re.Match) -> str:
         # we conveniently avoid having to handle invalid dates (such as Feb 29th in a
         # non-leap year) until after we've decided which century to use.
 
-        now: datetime.datetime = datetime.datetime.now(datetime.timezone.utc)
+        now: datetime = datetime.now(timezone.utc)
         year: int = max(now.year, MIN_YEAR)
 
         lm_dmy: list[str] = matches.group(2).split("-")
@@ -292,10 +292,7 @@ def unixtime_to_httpdate(unixtime: Optional[int]) -> Optional[str]:
     # No try/except block here. The input is guaranteed to be an int within the range
     # specified above, so the only way this fails is if something is borked with the
     # `datetime` module; we probably don't want to silently continue in that scenario.
-    date: datetime.datetime = datetime.datetime.fromtimestamp(
-        unixtime,
-        tz=datetime.timezone.utc,
-    )
+    date: datetime = datetime.fromtimestamp(unixtime, tz=timezone.utc)
 
     # IMF-fixdate format.
     return date.strftime("%a, %d %b %Y %H:%M:%S GMT")
