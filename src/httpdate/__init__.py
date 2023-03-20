@@ -5,4 +5,4 @@
 
 from .httpdate import httpdate_to_unixtime, is_valid_httpdate, unixtime_to_httpdate
 
-__version__ = "0.0.0"
+__version__ = "1.0.0"
