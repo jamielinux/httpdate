@@ -1,0 +1,171 @@
+# SPDX-FileCopyrightText: Copyright © 2023 Jamie Nguyen <j@jamielinux.com>
+# SPDX-License-Identifier: MIT
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "httpdate"
+description = "Parse and format HTTP dates, such as Last-Modified and If-Modified-Since headers."
+readme = "README.md"
+requires-python = ">=3.7"
+license = { file = "LICENSE" }
+keywords = ["rfc9110", "lastmodified", "last-modified", "if-modified-since"]
+authors = [
+  { name = "Jamie Nguyen", email = "j@jamielinux.com" },
+]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.7",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+  "Intended Audience :: Developers",
+  "Topic :: Software Development :: Libraries",
+]
+dependencies = [
+  "leapseconds >= 2023.3.0",
+]
+dynamic = ["version"]
+
+[project.urls]
+Homepage = "https://github.com/jamielinux/httpdate"
+Issues = "https://github.com/jamielinux/httpdate/issues"
+Source = "https://github.com/jamielinux/httpdate"
+
+[tool.hatch.version]
+path = "src/httpdate/__init__.py"
+
+# Local tests
+[tool.hatch.envs.default]
+dependencies = [
+  "black ~= 23.1.0",
+  "coverage ~= 7.2.2",
+  "hatch-containers ~= 0.7.0",
+  "pre-commit ~= 3.1.1",
+  "pylint ~= 2.17.0",
+  "pyright ~= 1.1.299",
+  "pytest ~= 7.2.2",
+  "pytest-mock ~= 3.10.0",
+  "ruff ~= 0.0.257",
+  "scriv ~= 1.2.1",
+  "ssort ~= 0.11.6",
+]
+[tool.hatch.envs.default.scripts]
+cov = ["coverage run -p", "coverage combine -q", "coverage report -m"]
+check = [
+  "ruff check .",
+  "pylint src",
+  "black --quiet --check --diff .",
+  "pyright",
+  "ssort --check --diff .",
+]
+
+# Local tests in containers with cpython
+[tool.hatch.envs.test]
+type = "container"
+platforms = ["linux"]
+dependencies = [
+  "coverage ~= 7.2.2",
+  "pytest ~= 7.2.2",
+  "pytest-mock ~= 3.10.0",
+]
+image = "python:{version}"
+[tool.hatch.envs.test.scripts]
+cov = ["coverage run -p", "coverage combine -q", "coverage report -m"]
+[[tool.hatch.envs.test.matrix]]
+python = ["3.7", "3.8", "3.9", "3.10", "3.11"]
+
+# Local tests in containers with pypy
+[tool.hatch.envs.testpypy]
+type = "container"
+platforms = ["linux"]
+dependencies = [
+  "coverage ~= 7.2.2",
+  "pytest ~= 7.2.2",
+  "pytest-mock ~= 3.10.0",
+]
+image = "pypy:{version}"
+[tool.hatch.envs.testpypy.scripts]
+cov = ["coverage run -p", "coverage combine -q", "coverage report -m"]
+[[tool.hatch.envs.testpypy.matrix]]
+python = ["3.7", "3.8", "3.9"]
+
+# GitHub Workflow: CI
+[tool.hatch.envs.ci]
+platforms = ["linux", "macos", "windows"]
+dependencies = [
+  "coverage ~= 7.2.2",
+  "pytest ~= 7.2.2",
+  "pytest-mock ~= 3.10.0",
+]
+[tool.hatch.envs.ci.scripts]
+cov = ["coverage run -p", "coverage combine -q --keep", "coverage report -m", "coverage json -q"]
+[[tool.hatch.envs.ci.matrix]]
+python = ["3.7", "3.8", "3.9", "3.10", "3.11", "pypy3.7", "pypy3.8", "pypy3.9"]
+
+# GitHub Workflow: Publish
+[tool.hatch.envs.publish]
+platforms = ["linux"]
+dependencies = []
+[[tool.hatch.envs.publish.matrix]]
+python = ["3.11"]
+
+# pytest & coverage
+[tool.pytest.ini_options]
+addopts = [
+    "--import-mode=importlib",
+]
+[tool.coverage.run]
+branch = true
+parallel = true
+command_line = "-m pytest"
+omit = [
+  "tests/*"
+]
+source = ["."]
+[tool.coverage.report]
+exclude_lines = [
+  "no cov",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+]
+[tool.coverage.paths]
+source = [
+  ".",
+  "/Users/runner/work/leapseconds/leapseconds",
+  'D:\a\leapseconds\leapseconds',
+]
+
+# other tools
+[tool.scriv]
+fragment_directory = ".changelog.d"
+format = "md"
+version = "literal: src/httpdate/__init__.py: __version__"
+
+[tool.ruff]
+target-version = "py37"
+line-length = 88
+pydocstyle.convention = "google"
+select = [
+  "A", "ARG", "B", "BLE", "C", "C4", "C90", "COM", "D", "DTZ", "E", "EXE", "F", "FBT",
+  "G", "I", "INP", "ISC", "N", "PIE", "PT", "PTH", "PYI", "RET", "RSE", "RUF", "S",
+  "SIM", "SLF", "T10", "T20", "TCH", "TRY", "W", "YTT"
+]
+[tool.ruff.per-file-ignores]
+"__init__.py" = ["F401"]
+"test*" = ["D", "INP001", "S"]
+[tool.ruff.mccabe]
+max-complexity = 10
+
+[tool.black]
+line-length = 88
+target_version = ["py37", "py38", "py39", "py310", "py311"]
+
+[tool.pyright]
+include = ["."]

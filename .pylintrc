@@ -1,0 +1,6 @@
+[MAIN]
+ignore-patterns=test*
+jobs=0
+
+[MESSAGES CONTROL]
+disable=
