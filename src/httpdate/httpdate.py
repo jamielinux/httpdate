@@ -136,13 +136,13 @@ def _normalize_for_strptime(fmt: str, matches: re.Match) -> str:
         return f"{lm_dd:02}-{MONTHS[lm_month]:02}-{yyyy} {matches.group(3)} GMT"
 
     if fmt == "asctime-date":
-        month = matches.group(2)
+        month: str = matches.group(2)
         if month not in MONTHS:
             raise ValueError(month)
         return f"{MONTHS[month]:02} {matches.group(3).strip()}"
 
     # IMF-fixdate
-    month = matches.group(3)
+    month: str = matches.group(3)
     if month not in MONTHS:
         raise ValueError(month)
     return f"{matches.group(2)} {MONTHS[month]:02} {matches.group(4)}"
