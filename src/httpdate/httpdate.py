@@ -11,7 +11,6 @@ __all__ = (
     "MIN_YEAR",
     "MAX_YEAR",
     "MIN_UNIXTIME",
-    "MAX_UNIXTIME",
     "RFC9110",
     "MONTHS",
     "WEEKDAYS",
@@ -32,8 +31,6 @@ MAX_YEAR: int = 9999
 
 # Jan 1st, 1900, 00:00:00  (RFC 9110 / RFC 5322 minimum)
 MIN_UNIXTIME: int = -2208988800
-# Dec 31st, 9999, 23:59:59  (the datetime module maximum)
-MAX_UNIXTIME: int = 253402300799
 
 # The regexes need not be bulletproof, as we're checking for semantic correctness
 # later. The vital part is `GMT` because `time.strptime()` isn't timezone aware and
@@ -289,13 +286,15 @@ def unixtime_to_httpdate(unixtime: int) -> Optional[str]:
         msg: str = "unixtime must be of type int"
         raise TypeError(msg)
 
-    if unixtime < MIN_UNIXTIME or unixtime > MAX_UNIXTIME:
+    if unixtime < MIN_UNIXTIME:
         return None
 
-    # No try/except block here. The input is guaranteed to be an int within the range
-    # specified above, so the only way this fails is if something is borked with the
-    # `datetime` module; we probably don't want to silently continue in that scenario.
-    date: datetime = datetime.fromtimestamp(unixtime, tz=timezone.utc)
+    try:
+        date: datetime = datetime.fromtimestamp(unixtime, tz=timezone.utc)
+    except (OSError, OverflowError, ValueError):
+        # The maximum unixtime that can be passed to `datetime.fromtimestamp()` varies
+        # by platform. On Linux, the max year is 9999, but on Windows it's around 3000.
+        return None
 
     # IMF-fixdate format.
     return date.strftime("%a, %d %b %Y %H:%M:%S GMT")
