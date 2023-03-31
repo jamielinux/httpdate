@@ -1,7 +1,12 @@
-default:
+# Show help
+help:
   @just --list
 
 current_version := `hatch version`
+
+# Create changelog entry
+changelog:
+  scriv create --edit
 
 # Tag and changelog
 tag:
@@ -11,14 +16,14 @@ tag:
       echo "Not on 'main' branch"
       exit 1
   fi
-  echo "Current version: {{current_version}}"
-  read -rep "    New version: " version
-  sed -i -e "s|^__version__ =.*$|__version__ = \"$version\"|" ./src/*/__init__.py
   entries="$(find .changelog.d -mindepth 1 -maxdepth 1 -type f -name '*.md' | wc -l)"
   if (( entries == 0 )); then
       echo "No changelog entries"
       exit 1
   fi
+  echo "Current version: {{current_version}}"
+  read -rep "    New version: " version
+  sed -i -e "s|^__version__ =.*$|__version__ = \"$version\"|" ./src/*/__init__.py
   scriv collect --version v$version
   git add .changelog.d CHANGELOG.md src/*/__init__.py
   git commit -q -m v$version
