@@ -21,7 +21,7 @@ import calendar
 import re
 import time
 from datetime import datetime, timezone
-from typing import Dict, Optional, Tuple
+from typing import Dict, Match, Optional, Tuple
 
 from leapseconds import LEAP_SECONDS
 
@@ -92,7 +92,7 @@ WEEKDAYS: Dict[int, Tuple[str, str]] = {
 }
 
 
-def _normalize_for_strptime(fmt: str, matches: re.Match[str]) -> str:
+def _normalize_for_strptime(fmt: str, matches: Match[str]) -> str:
     if fmt == "rfc850-date":
         # When `time.strptime()` parses a 2-digit year, the year is converted as per the
         # POSIX and ISO C standards (which the `time` docs currently state means values
@@ -246,7 +246,7 @@ def httpdate_to_unixtime(httpdate: Optional[str]) -> Optional[int]:
         raise TypeError(msg)
 
     for key, fields in RFC9110.items():
-        matches: Optional[re.Match[str]] = re.match(fields["regex"], httpdate)
+        matches: Optional[Match[str]] = re.match(fields["regex"], httpdate)
         if matches:
             try:
                 _httpdate: str = _normalize_for_strptime(key, matches)
