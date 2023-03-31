@@ -317,11 +317,4 @@ def is_valid_httpdate(httpdate: Optional[str]) -> bool:
     Raises:
         TypeError: If the input is not of type `str` or `None`.
     """
-    if httpdate is None:
-        return False
-
-    if not isinstance(httpdate, str):
-        msg: str = "httpdate must be of type str or None"
-        raise TypeError(msg)
-
     return httpdate_to_unixtime(httpdate) is not None
