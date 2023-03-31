@@ -250,7 +250,7 @@ def httpdate_to_unixtime(httpdate: Optional[str]) -> Optional[int]:
         if matches:
             try:
                 _httpdate: str = _normalize_for_strptime(key, matches)
-            except ValueError:
+            except (OSError, ValueError):
                 return None
 
             try:
