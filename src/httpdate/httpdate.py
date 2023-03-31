@@ -263,7 +263,7 @@ def httpdate_to_unixtime(httpdate: Optional[str]) -> Optional[int]:
     return None
 
 
-def unixtime_to_httpdate(unixtime: Optional[int]) -> Optional[str]:
+def unixtime_to_httpdate(unixtime: int) -> Optional[str]:
     """Format a Unix timestamp as an HTTP date (eg, for an `If-Modified-Since` header).
 
     According to RFC 9110 Section 5.6.7, the `IMF-fixdate` format must be used when
@@ -275,21 +275,18 @@ def unixtime_to_httpdate(unixtime: Optional[int]) -> Optional[str]:
     See docstring for httpdate_to_unixtime() for more information on RFC 9110 criteria.
 
     Args:
-        unixtime (Optional[int]): A Unix timestamp.
+        unixtime (int): A Unix timestamp.
 
     Returns:
-        Optional[str]: A valid IMF-fixdate header, or None if the input was None.
+        Optional[str]: A valid IMF-fixdate header. It will return None if the input is
+            less than MIN_UNIXTIME, or if the input is greater than the value supported
+            by the operating system.
 
     Raises:
-        TypeError: If the input is not of type `int` or `None`.
-        ValueError: If the input represents a date outside of the acceptable range
-            (Jan 1st, 1900 to Dec 31st, 9999).
+        TypeError: If the input is not of type `int`.
     """
-    if unixtime is None:
-        return None
-
     if not isinstance(unixtime, int):  # type: ignore
-        msg: str = "unixtime must be of type int or None"
+        msg: str = "unixtime must be of type int"
         raise TypeError(msg)
 
     if unixtime < MIN_UNIXTIME or unixtime > MAX_UNIXTIME:
