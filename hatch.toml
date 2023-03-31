@@ -1,5 +1,5 @@
 [version]
-path = "src/httpdate/__init__.py"
+path = "src/httpdate/__about__.py"
 
 # Local tests
 [envs.default]

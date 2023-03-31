@@ -23,9 +23,9 @@ tag:
   fi
   echo "Current version: {{current_version}}"
   read -rep "    New version: " version
-  sed -i -e "s|^__version__ =.*$|__version__ = \"$version\"|" ./src/*/__init__.py
+  sed -i -e "s|^__version__ =.*$|__version__ = \"$version\"|" ./src/*/__about__.py
   scriv collect --version v$version
-  git add .changelog.d CHANGELOG.md src/*/__init__.py
+  git add .changelog.d CHANGELOG.md src/*/__about__.py
   git commit -q -m v$version
   git tag -a v$version -m "Release $version"
   git show

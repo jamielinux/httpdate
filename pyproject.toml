@@ -68,7 +68,7 @@ source = [
 [tool.scriv]
 fragment_directory = ".changelog.d"
 format = "md"
-version = "literal: src/httpdate/__init__.py: __version__"
+version = "literal: src/httpdate/__about__.py: __version__"
 
 # checkers, formatters & linters
 [tool.ruff]
