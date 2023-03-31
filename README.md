@@ -108,7 +108,7 @@ unixtime_to_httpdate(784111777)
     - `int`: A Unix timestamp.
   - *Returns*
     - `Optional[str]`: An HTTP date string. It will return `None` if the input
-      represents a year before 1900, or if the input is greater than the value supported
+      represents a year before 1900, or if the input is outside the range supported
       by the operating system.
   - *Raises*
     - `TypeError` if input is not of type `int`.

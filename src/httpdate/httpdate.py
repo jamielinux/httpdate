@@ -276,8 +276,8 @@ def unixtime_to_httpdate(unixtime: int) -> Optional[str]:
 
     Returns:
         Optional[str]: A valid IMF-fixdate header. It will return None if the input is
-            less than MIN_UNIXTIME, or if the input is greater than the value supported
-            by the operating system.
+            less than MIN_UNIXTIME, or if the input is outside the range supported by
+            the operating system.
 
     Raises:
         TypeError: If the input is not of type `int`.
