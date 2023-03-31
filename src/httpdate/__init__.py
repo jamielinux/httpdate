@@ -4,7 +4,6 @@
 """Parse and format HTTP dates, such as Last-Modified and If-Modified-Since headers."""
 
 from .httpdate import (
-    MAX_YEAR,
     MIN_UNIXTIME,
     MIN_YEAR,
     MONTHS,
@@ -16,7 +15,6 @@ from .httpdate import (
 )
 
 __all__ = [
-    "MAX_YEAR",
     "MIN_UNIXTIME",
     "MIN_YEAR",
     "MONTHS",

@@ -61,6 +61,11 @@ def test_imffixdate_bad(value):
     assert httpdate_to_unixtime(value) is None
 
 
+def test_timegm_exception():
+    with patch("calendar.timegm", side_effect=ValueError):
+        assert httpdate_to_unixtime("Sat, 29 Feb 2020 00:00:00 GMT") is None
+
+
 #
 # rfc850-date
 

@@ -9,7 +9,6 @@ __all__ = (
     "unixtime_to_httpdate",
     "is_valid_httpdate",
     "MIN_YEAR",
-    "MAX_YEAR",
     "MIN_UNIXTIME",
     "RFC9110",
     "MONTHS",
@@ -26,8 +25,6 @@ from leapseconds import LEAP_SECONDS
 
 # Minimum year accepted by RFC 9110.
 MIN_YEAR: int = 1900
-# Maximum year supported by the `calendar` module.
-MAX_YEAR: int = 9999
 
 # Jan 1st, 1900, 00:00:00  (RFC 9110 / RFC 5322 minimum)
 MIN_UNIXTIME: int = -2208988800
@@ -114,7 +111,7 @@ def _normalize_for_strptime(fmt: str, matches: Match[str]) -> str:
         lm_yy: str = lm_dmy[2]
 
         if lm_month not in MONTHS:
-            raise ValueError(lm_month)
+            raise ValueError
 
         this_c: str = str(year // 100)
         last_c: str = str(int(this_c) - 1)
@@ -143,13 +140,13 @@ def _normalize_for_strptime(fmt: str, matches: Match[str]) -> str:
     if fmt == "asctime-date":
         month: str = matches.group(2)
         if month not in MONTHS:
-            raise ValueError(month)
+            raise ValueError
         return f"{MONTHS[month]:02} {matches.group(3).strip()}"
 
     # IMF-fixdate
     month: str = matches.group(3)
     if month not in MONTHS:
-        raise ValueError(month)
+        raise ValueError
     return f"{matches.group(2)} {MONTHS[month]:02} {matches.group(4)}"
 
 
@@ -164,7 +161,7 @@ def _string_to_unixtime(fmt: str, httpdate: str, wday: str) -> int:
             RFC9110[fmt]["strptime"],
         )
     except ValueError as exc:
-        raise ValueError(httpdate) from exc
+        raise ValueError from exc
 
     expected_wday: str = WEEKDAYS[struct_time.tm_wday][0 if fmt == "rfc850-date" else 1]
     if (
@@ -174,18 +171,18 @@ def _string_to_unixtime(fmt: str, httpdate: str, wday: str) -> int:
         # erroneous notion of "double leap seconds" in earlier versions of the POSIX
         # standard. `61` isn't accepted by either RFC 9110 or the `calendar` module.
         or struct_time.tm_sec > 60
-        # See comments at the top of this file.
+        # See comments for MIN_YEAR.
         or struct_time.tm_year < MIN_YEAR
-        or struct_time.tm_year > MAX_YEAR
     ):
-        raise ValueError(struct_time)
+        raise ValueError
 
-    # No try/except block here. Due to the validation we do above, it's impossible to
-    # pass a `time.struct_time` object to `calendar.timegm()` that it can't handle.
-    timestamp: int = calendar.timegm(struct_time)
+    try:
+        timestamp: int = calendar.timegm(struct_time)
+    except (OSError, OverflowError, ValueError) as exc:
+        raise ValueError from exc
 
     if struct_time.tm_sec == 60 and timestamp not in LEAP_SECONDS:
-        raise ValueError(struct_time)
+        raise ValueError
 
     return timestamp
 
