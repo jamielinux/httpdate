@@ -9,6 +9,8 @@ __all__ = (
     "is_valid_httpdate",
     "MIN_YEAR",
     "MAX_YEAR",
+    "MIN_UNIXTIME",
+    "MAX_UNIXTIME",
     "RFC9110",
     "MONTHS",
     "WEEKDAYS",
@@ -26,6 +28,11 @@ from leapseconds import LEAP_SECONDS
 MIN_YEAR: int = 1900
 # Maximum year supported by the `calendar` module.
 MAX_YEAR: int = 9999
+
+# Jan 1st, 1900, 00:00:00  (RFC 9110 / RFC 5322 minimum)
+MIN_UNIXTIME: int = -2208988800
+# Dec 31st, 9999, 23:59:59  (the datetime module maximum)
+MAX_UNIXTIME: int = 253402300799
 
 # The regexes need not be bulletproof, as we're checking for semantic correctness
 # later. The vital part is `GMT` because `time.strptime()` isn't timezone aware and
@@ -284,9 +291,7 @@ def unixtime_to_httpdate(unixtime: Optional[int]) -> Optional[str]:
         msg: str = "unixtime must be of type int or None"
         raise TypeError(msg)
 
-    # -2208988800   = Jan  1st, 1900, 00:00:00  (RFC 9110 / RFC 5322 minimum)
-    #  253402300799 = Dec 31st, 9999, 23:59:59  (the datetime module maximum)
-    if unixtime < -2208988800 or unixtime > 253402300799:
+    if unixtime < MIN_UNIXTIME or unixtime > MAX_UNIXTIME:
         return None
 
     # No try/except block here. The input is guaranteed to be an int within the range
