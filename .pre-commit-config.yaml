@@ -2,7 +2,7 @@
 # See https://pre-commit.com/hooks.html for more hooks
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: f71fa2c1f9cf5cb705f73dffe4b21f7c61470ba9 # v4.4.0
     hooks:
       - id: check-case-conflict
       - id: check-merge-conflict
@@ -23,14 +23,14 @@ repos:
         language: system
         types: [python]
   - repo: https://github.com/charliermarsh/ruff-pre-commit
-    rev: v0.0.257
+    rev: 3c6d40da8d90069e86c0ba3942239d773aadad1a # v0.0.260
     hooks:
       - id: ruff
   - repo: https://github.com/psf/black
-    rev: 23.1.0
+    rev: bf7a16254ec96b084a6caf3d435ec18f0f245cc7 # 23.3.0
     hooks:
       - id: black
   - repo: https://github.com/bwhmather/ssort
-    rev: v0.11.6
+    rev: 85ce691bd9dd6528a267aaf3e1ac7d455ecd773c # v0.11.6
     hooks:
       - id: ssort
