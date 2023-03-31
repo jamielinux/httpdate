@@ -1,5 +1,6 @@
 # SPDX-FileCopyrightText: Copyright © 2023 Jamie Nguyen <j@jamielinux.com>
 # SPDX-License-Identifier: MIT
+# pyright: strict
 
 """Parse and format HTTP dates, such as Last-Modified and If-Modified-Since headers."""
 
@@ -91,7 +92,7 @@ WEEKDAYS: Dict[int, Tuple[str, str]] = {
 }
 
 
-def _normalize_for_strptime(fmt: str, matches: re.Match) -> str:
+def _normalize_for_strptime(fmt: str, matches: re.Match[str]) -> str:
     if fmt == "rfc850-date":
         # When `time.strptime()` parses a 2-digit year, the year is converted as per the
         # POSIX and ISO C standards (which the `time` docs currently state means values
@@ -240,12 +241,12 @@ def httpdate_to_unixtime(httpdate: Optional[str]) -> Optional[int]:
     if httpdate is None:
         return None
 
-    if not isinstance(httpdate, str):
+    if not isinstance(httpdate, str):  # type: ignore
         msg: str = "httpdate must be of type str or None"
         raise TypeError(msg)
 
     for key, fields in RFC9110.items():
-        matches: Optional[re.Match] = re.match(fields["regex"], httpdate)
+        matches: Optional[re.Match[str]] = re.match(fields["regex"], httpdate)
         if matches:
             try:
                 _httpdate: str = _normalize_for_strptime(key, matches)
@@ -287,7 +288,7 @@ def unixtime_to_httpdate(unixtime: Optional[int]) -> Optional[str]:
     if unixtime is None:
         return None
 
-    if not isinstance(unixtime, int):
+    if not isinstance(unixtime, int):  # type: ignore
         msg: str = "unixtime must be of type int or None"
         raise TypeError(msg)
 
