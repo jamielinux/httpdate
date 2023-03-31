@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from unittest.mock import patch
 
 import pytest
 from httpdate import httpdate_to_unixtime
@@ -64,24 +65,6 @@ def test_imffixdate_bad(value):
 # rfc850-date
 
 
-def create_mock_datetime_now(
-    year=2020,
-    month=1,
-    day=1,
-    hour=0,
-    minute=0,
-    second=0,
-    tzinfo=timezone.utc,
-):
-    class MockDatetimeNow(datetime):
-        @classmethod
-        def now(cls, *args, **kwargs):
-            del args, kwargs
-            return cls(year, month, day, hour, minute, second, tzinfo=tzinfo)
-
-    return MockDatetimeNow
-
-
 @pytest.mark.parametrize(
     ("value", "expected"),
     [
@@ -91,12 +74,15 @@ def create_mock_datetime_now(
         ("Saturday, 31-Dec-16 23:59:60 GMT", 1483228800),
     ],
 )
-def test_rfc850date_good(mocker, value, expected):
-    mocker.patch(
-        "httpdate.httpdate.datetime",
-        create_mock_datetime_now(),
-    )
-    assert httpdate_to_unixtime(value) == expected
+def test_rfc850date_good(value, expected):
+    class MockDatetime:
+        @classmethod
+        def now(cls, *args, **kwargs):
+            del args, kwargs
+            return datetime(2020, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
+
+    with patch("httpdate.httpdate.datetime", new=MockDatetime):
+        assert httpdate_to_unixtime(value) == expected
 
 
 @pytest.mark.parametrize(
@@ -116,34 +102,43 @@ def test_rfc850date_good(mocker, value, expected):
         ("Thursday, 31-Dec-15 23:59:60 GMT"),  # not an official leap second
     ],
 )
-def test_rfc850date_bad(mocker, value):
-    mocker.patch(
-        "httpdate.httpdate.datetime",
-        create_mock_datetime_now(),
-    )
-    assert httpdate_to_unixtime(value) is None
+def test_rfc850date_bad(value):
+    class MockDatetime:
+        @classmethod
+        def now(cls, *args, **kwargs):
+            del args, kwargs
+            return datetime(2020, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
+
+    with patch("httpdate.httpdate.datetime", new=MockDatetime):
+        assert httpdate_to_unixtime(value) is None
 
 
-def test_rfc850date_1949(mocker):
-    mocker.patch(
-        "httpdate.httpdate.datetime",
-        create_mock_datetime_now(1949, 12, 31, 23, 59, 59),
-    )
-    # year == 1999
-    assert httpdate_to_unixtime("Friday, 31-Dec-99 23:59:59 GMT") == 946684799
-    # year == 1899
-    assert httpdate_to_unixtime("Friday, 31-Dec-99 23:59:60 GMT") is None
+def test_rfc850date_1949():
+    class MockDatetime:
+        @classmethod
+        def now(cls, *args, **kwargs):
+            del args, kwargs
+            return datetime(1949, 12, 31, 23, 59, 59, tzinfo=timezone.utc)
+
+    with patch("httpdate.httpdate.datetime", new=MockDatetime):
+        # year == 1999
+        assert httpdate_to_unixtime("Friday, 31-Dec-99 23:59:59 GMT") == 946684799
+        # year == 1899
+        assert httpdate_to_unixtime("Friday, 31-Dec-99 23:59:60 GMT") is None
 
 
-def test_rfc850date_1899(mocker):
-    mocker.patch(
-        "httpdate.httpdate.datetime",
-        create_mock_datetime_now(1899, 12, 31, 23, 59, 59),
-    )
-    # year == 1899
-    assert httpdate_to_unixtime("Sunday, 31-Dec-99 23:59:59 GMT") is None
-    # year == 1949
-    assert httpdate_to_unixtime("Saturday, 31-Dec-49 23:59:59 GMT") == -631152001
+def test_rfc850date_1899():
+    class MockDatetime:
+        @classmethod
+        def now(cls, *args, **kwargs):
+            del args, kwargs
+            return datetime(1899, 12, 31, 23, 59, 59, tzinfo=timezone.utc)
+
+    with patch("httpdate.httpdate.datetime", new=MockDatetime):
+        # year == 1899
+        assert httpdate_to_unixtime("Sunday, 31-Dec-99 23:59:59 GMT") is None
+        # year == 1949
+        assert httpdate_to_unixtime("Saturday, 31-Dec-49 23:59:59 GMT") == -631152001
 
 
 #

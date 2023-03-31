@@ -10,7 +10,6 @@ dependencies = [
   "pre-commit ~= 3.2",
   "pylint ~= 2.17",
   "pytest ~= 7.2",
-  "pytest-mock ~= 3.10",
   "ruff >= 0.0.257",
   "scriv >= 1.2.1",
   "ssort >= 0.11.6",
@@ -30,7 +29,6 @@ lint = [
 dependencies = [
   "coverage ~= 7.2",
   "pytest ~= 7.2",
-  "pytest-mock ~= 3.10",
 ]
 
 # GitHub Workflow: CI
