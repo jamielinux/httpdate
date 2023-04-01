@@ -77,41 +77,49 @@ from httpdate import is_valid_httpdate, httpdate_to_unixtime, unixtime_to_httpda
 # Check if an HTTP date (eg, `Last-Modified` header) is valid:
 is_valid_httpdate("Sun, 06 Nov 1994 08:49:37 GMT")
 
-# Parse an HTTP date:
-httpdate_to_unixtime("Sun, 06 Nov 1994 08:49:37 GMT")
-# Parse an HTTP date (rfc850-date):
-httpdate_to_unixtime("Sunday, 06-Nov-94 08:49:37 GMT")
-# Parse an HTTP date (asctime-date):
-httpdate_to_unixtime("Sun Nov  6 08:49:37 1994")
+try:
+    # Parse an HTTP date:
+    httpdate_to_unixtime("Sun, 06 Nov 1994 08:49:37 GMT")
+    # Parse an HTTP date (rfc850-date):
+    httpdate_to_unixtime("Sunday, 06-Nov-94 08:49:37 GMT")
+    # Parse an HTTP date (asctime-date):
+    httpdate_to_unixtime("Sun Nov  6 08:49:37 1994")
+except ValueError:
+    # Not a valid HTTP date string.
+    pass
 
 # Format a Unix timestamp as an HTTP date:
-unixtime_to_httpdate(784111777)
+try:
+    unixtime_to_httpdate(784111777)
+except ValueError:
+    # Outside the range supported by the operating system.
+    pass
 ```
 
 - **`is_valid_httpdate(httpdate)`**:
   - *Args*
-    - `Optional[str]`
+    - `str`: An HTTP date string.
   - *Returns*
-    - `bool`: True if input is valid, False if invalid or the input is `None`.
+    - `bool`: True if `httpdate` is a valid HTTP date string, otherwise False.
   - *Raises*
-    - `TypeError` if input is not `str` or `None`.
+    - `TypeError` if input is not of type `str`.
 - **`httpdate_to_unixtime(httpdate)`**:
   - *Args*
-    - `Optional[str]`
+    - `str`: An HTTP date string.
   - *Returns*
-    - `Optional[int]`: A Unix timestamp (`int`) if input is valid, `None` if invalid
-      or input is `None`.
+    - `int`: A Unix timestamp (`int`) if input is valid.
   - *Raises*
-    - `TypeError` if input is not `str` or `None`.
+    - `TypeError` if input is not of type `str`.
+    - `ValueError` if `httpdate` is not a valid HTTP date string.
 - **`unixtime_to_httpdate(unixtime)`**:
   - *Args*
     - `int`: A Unix timestamp.
   - *Returns*
-    - `Optional[str]`: An HTTP date string. It will return `None` if the input
-      represents a year before 1900, or if the input is outside the range supported
-      by the operating system.
+    - `str`: An HTTP date string.
   - *Raises*
     - `TypeError` if input is not of type `int`.
+    - `ValueError` if `unixtime` represents a year before 1900, or if it is outside
+      the range supported by the operating system.
 
 ## Why Unix timestamps?
 

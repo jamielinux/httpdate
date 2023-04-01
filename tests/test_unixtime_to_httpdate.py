@@ -35,12 +35,6 @@ def test_unixtime_good(value, expected):
     assert unixtime_to_httpdate(value) == expected
 
 
-@pytest.mark.skipif("sys.platform != 'win32'", reason="Windows-only")
-def test_unixtime_unsupported_win32():
-    # Should return None, not raise an OSError.
-    assert unixtime_to_httpdate(-2208988800) is None
-
-
 @pytest.mark.parametrize(
     "value",
     [
@@ -49,4 +43,5 @@ def test_unixtime_unsupported_win32():
     ],
 )
 def test_unixtime_bad(value):
-    assert unixtime_to_httpdate(value) is None
+    with pytest.raises(ValueError, match="is out of range"):
+        unixtime_to_httpdate(value)

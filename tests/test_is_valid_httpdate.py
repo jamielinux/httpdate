@@ -3,7 +3,8 @@ from httpdate import is_valid_httpdate
 
 
 def test_type_none():
-    assert not is_valid_httpdate(None)
+    with pytest.raises(TypeError):
+        is_valid_httpdate(None)  # type: ignore
 
 
 def test_type_str():

@@ -160,8 +160,8 @@ def _string_to_unixtime(fmt: str, httpdate: str, wday: str) -> int:
             httpdate,
             RFC9110[fmt]["strptime"],
         )
-    except ValueError as exc:
-        raise ValueError from exc
+    except ValueError:
+        raise ValueError("Invalid HTTP-date") from None
 
     expected_wday: str = WEEKDAYS[struct_time.tm_wday][0 if fmt == "rfc850-date" else 1]
     if (
@@ -174,20 +174,23 @@ def _string_to_unixtime(fmt: str, httpdate: str, wday: str) -> int:
         # See comments for MIN_YEAR.
         or struct_time.tm_year < MIN_YEAR
     ):
-        raise ValueError
+        raise ValueError("Invalid HTTP-date")
 
+    # Any `time.struct_time` object that `time.strptime()` produces (from the format
+    # strings we use) should be parseable by `calendar.timegm()`. But just in case,
+    # we'll wrap in a try/except.
     try:
         timestamp: int = calendar.timegm(struct_time)
-    except (OSError, OverflowError, ValueError) as exc:
-        raise ValueError from exc
+    except (OverflowError, ValueError):
+        raise ValueError("Out of range") from None
 
     if struct_time.tm_sec == 60 and timestamp not in LEAP_SECONDS:
-        raise ValueError
+        raise ValueError("Invalid leap second")
 
     return timestamp
 
 
-def httpdate_to_unixtime(httpdate: Optional[str]) -> Optional[int]:
+def httpdate_to_unixtime(httpdate: str) -> int:
     """Parse an HTTP date (eg, `Last-Modified`) into a Unix timestamp.
 
     All HTTP dates (eg, in `Last-Modified` headers) must be sent in this format:
@@ -230,13 +233,11 @@ def httpdate_to_unixtime(httpdate: Optional[str]) -> Optional[int]:
             is None or the HTTP date is invalid.
 
     Raises:
-        TypeError: If the input is not of type `str` or `None`.
+        TypeError: If the input is not of type `str`.
+        ValueError: If the input is not a valid HTTP date.
     """
-    if httpdate is None:
-        return None
-
     if not isinstance(httpdate, str):  # type: ignore
-        msg: str = "httpdate must be of type str or None"
+        msg = f"'{type(httpdate)}' object cannot be interpreted as a string"
         raise TypeError(msg)
 
     for key, fields in RFC9110.items():
@@ -245,19 +246,20 @@ def httpdate_to_unixtime(httpdate: Optional[str]) -> Optional[int]:
             try:
                 _httpdate: str = _normalize_for_strptime(key, matches)
             except (OSError, ValueError):
-                return None
+                break
 
             try:
                 unixtime: int = _string_to_unixtime(key, _httpdate, matches.group(1))
-            except ValueError:
-                return None
+            except ValueError as exc:
+                raise ValueError(f"{exc}: '{httpdate}'") from None
 
             return unixtime
 
-    return None
+    msg = f"Invalid HTTP-date: '{httpdate}'"
+    raise ValueError(msg)
 
 
-def unixtime_to_httpdate(unixtime: int) -> Optional[str]:
+def unixtime_to_httpdate(unixtime: int) -> str:
     """Format a Unix timestamp as an HTTP date (eg, for an `If-Modified-Since` header).
 
     According to RFC 9110 Section 5.6.7, the `IMF-fixdate` format must be used when
@@ -272,43 +274,52 @@ def unixtime_to_httpdate(unixtime: int) -> Optional[str]:
         unixtime (int): A Unix timestamp.
 
     Returns:
-        Optional[str]: A valid IMF-fixdate header. It will return None if the input is
+        str: A valid IMF-fixdate header. It will return None if the input is
             less than MIN_UNIXTIME, or if the input is outside the range supported by
             the operating system.
 
     Raises:
-        TypeError: If the input is not of type `int`.
+        TypeError: If unixtime is not of type `int`.
+        ValueError: If unixtime represents a year before 1900, or is outside the
+            range supported by the operating system.
     """
     if not isinstance(unixtime, int):  # type: ignore
-        msg: str = "unixtime must be of type int"
+        msg: str = f"'{type(unixtime)}' object cannot be interpreted as an integer"
         raise TypeError(msg)
 
     if unixtime < MIN_UNIXTIME:
-        return None
+        msg = f"'{unixtime}' is out of range"
+        raise ValueError(msg)
 
     try:
         date: datetime = datetime.fromtimestamp(unixtime, tz=timezone.utc)
     except (OSError, OverflowError, ValueError):
         # The maximum unixtime that can be passed to `datetime.fromtimestamp()` varies
         # by platform. On Linux, the max year is 9999, but on Windows it's around 3000.
-        return None
+        msg = f"'{unixtime}' is out of range"
+        raise ValueError(msg) from None
 
     # IMF-fixdate format.
     return date.strftime("%a, %d %b %Y %H:%M:%S GMT")
 
 
-def is_valid_httpdate(httpdate: Optional[str]) -> bool:
+def is_valid_httpdate(httpdate: str) -> bool:
     """Check if an HTTP date field (eg, `Last-Modified`) is valid.
 
     See docstring for httpdate_to_unixtime() for more information on RFC 9110 criteria.
 
     Args:
-        httpdate (Optional[str]): An HTTP date field.
+        httpdate (str): An HTTP date field.
 
     Returns:
         bool: True if the input is valid, False if the input is None or invalid.
 
     Raises:
-        TypeError: If the input is not of type `str` or `None`.
+        TypeError: If the input is not of type `str`.
     """
-    return httpdate_to_unixtime(httpdate) is not None
+    try:
+        httpdate_to_unixtime(httpdate)
+    except ValueError:
+        return False
+
+    return True
