@@ -102,14 +102,14 @@ except ValueError:
   - *Returns*
     - `bool`: True if `httpdate` is a valid HTTP date string, otherwise False.
   - *Raises*
-    - `TypeError` if input is not of type `str`.
+    - `TypeError` if `httpdate` is not of type `str`.
 - **`httpdate_to_unixtime(httpdate)`**:
   - *Args*
     - `httpdate (str)`: An HTTP date string.
   - *Returns*
-    - `int`: A Unix timestamp (`int`) if input is valid.
+    - `int`: A Unix timestamp (`int`).
   - *Raises*
-    - `TypeError` if input is not of type `str`.
+    - `TypeError` if `httpdate` is not of type `str`.
     - `ValueError` if `httpdate` is not a valid HTTP date string.
 - **`unixtime_to_httpdate(unixtime)`**:
   - *Args*
@@ -117,7 +117,7 @@ except ValueError:
   - *Returns*
     - `str`: An HTTP date string.
   - *Raises*
-    - `TypeError` if input is not of type `int`.
+    - `TypeError` if `unixtime` is not of type `int`.
     - `ValueError` if `unixtime` represents a year before 1900, or if it is outside
       the range supported by the operating system.
 
