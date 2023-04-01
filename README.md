@@ -98,14 +98,14 @@ except ValueError:
 
 - **`is_valid_httpdate(httpdate)`**:
   - *Args*
-    - `str`: An HTTP date string.
+    - `httpdate (str)`: An HTTP date string.
   - *Returns*
     - `bool`: True if `httpdate` is a valid HTTP date string, otherwise False.
   - *Raises*
     - `TypeError` if input is not of type `str`.
 - **`httpdate_to_unixtime(httpdate)`**:
   - *Args*
-    - `str`: An HTTP date string.
+    - `httpdate (str)`: An HTTP date string.
   - *Returns*
     - `int`: A Unix timestamp (`int`) if input is valid.
   - *Raises*
@@ -113,7 +113,7 @@ except ValueError:
     - `ValueError` if `httpdate` is not a valid HTTP date string.
 - **`unixtime_to_httpdate(unixtime)`**:
   - *Args*
-    - `int`: A Unix timestamp.
+    - `unixtime (int)`: A Unix timestamp.
   - *Returns*
     - `str`: An HTTP date string.
   - *Raises*
