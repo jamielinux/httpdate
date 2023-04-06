@@ -6,6 +6,7 @@ current_version := `hatch version`
 
 # Create changelog entry
 changelog:
+  mkdir -p .changelog.d
   scriv create --edit
 
 # Tag and changelog
