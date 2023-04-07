@@ -22,7 +22,7 @@ lint = [
   "- pylint src",
   "- black --quiet --check --diff .",
   "- pyright-polite",
-  "- ssort --check --diff .",
+  "- ssort --check --diff src",
 ]
 
 # Templates
