@@ -1,6 +1,8 @@
 # SPDX-FileCopyrightText: Copyright © 2023 Jamie Nguyen <j@jamielinux.com>
 # SPDX-License-Identifier: MIT
 
+import sys
+
 import pytest
 from httpdate import unixtime_to_httpdate
 
@@ -26,7 +28,7 @@ def test_type_float():
         pytest.param(
             -2208988800,
             "Mon, 01 Jan 1900 00:00:00 GMT",
-            marks=pytest.mark.skipif("sys.platform == 'win32'", reason="POSIX-only"),
+            marks=pytest.mark.skipif(sys.platform == "win32", reason="POSIX-only"),
         ),
         (0, "Thu, 01 Jan 1970 00:00:00 GMT"),
         (784111777, "Sun, 06 Nov 1994 08:49:37 GMT"),
