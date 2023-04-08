@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: Copyright © 2023 Jamie Nguyen <j@jamielinux.com>
+# SPDX-License-Identifier: MIT
+
 from datetime import datetime, timezone
 from unittest.mock import patch
 
