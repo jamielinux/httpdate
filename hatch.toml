@@ -6,7 +6,6 @@ path = "src/httpdate/__about__.py"
 dependencies = [
   "black >= 23.1.0",
   "coverage ~= 7.2",
-  "hatch-containers ~= 0.7",
   "pre-commit ~= 3.2",
   "pylint ~= 2.17",
   "pyright-polite ~= 1.0",
