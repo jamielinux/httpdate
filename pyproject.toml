@@ -43,6 +43,9 @@ Source = "https://github.com/jamielinux/httpdate"
 [tool.pytest.ini_options]
 addopts = [
   "--import-mode=importlib",
+  "--strict-markers",
+  "--strict-config",
+  "-ra",
 ]
 [tool.coverage.run]
 branch = true
