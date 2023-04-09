@@ -1,4 +1,11 @@
 
+<a id='changelog-v1.2.0'></a>
+# v1.2.0 — 2023-04-09
+
+## Removed
+
+- Exclude some directories from the source distribution.
+
 <a id='changelog-v1.1.0'></a>
 # v1.1.0 — 2023-04-01
 
