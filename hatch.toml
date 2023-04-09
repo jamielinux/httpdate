@@ -1,6 +1,13 @@
 [version]
 path = "src/httpdate/__about__.py"
 
+[build.targets.sdist]
+exclude = [
+  "/.changelog.d",
+  "/.github",
+  "/tests",
+]
+
 # Local tests
 [envs.default]
 dependencies = [
